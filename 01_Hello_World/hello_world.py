@@ -24,9 +24,9 @@ janela.resizable(False, False)
 
 #inserindo um texto
 label_titulo = tk.Label(janela, text= "Helloo world!", 
-                        bg = "white", 
-                        foreground= "black",
-                        font=("Arial", 24))
+                        bg = "white", #cor de fundo
+                        foreground= "black", #cor da fonte
+                        font=("Arial", 24)) #fonte
 
 #desenha os componentes na janela "titulo do projeto"
 label_titulo.pack(pady=30) #pady adiciona um espaço vertical
@@ -36,19 +36,28 @@ label_nome = tk.Label(janela, text="Digite o seu nome: ",
                       bg = "white",
                       foreground= "black",
                       font= ("Arial", 14))
+
 #desenhando os componenetes 
-label_nome.pack(pady=10)
+label_nome.pack(pady=10) #pady é pra não ficar grudado
 
 #caixa de texto para a pessoa digitar o nome
 entry_nome = tk.Entry(janela)
 entry_nome.pack()
 
+#função do botão
+def desejar_bom_dia():
+    """Esta função pega o nome digitado na caixa de texto e deseja um bom dia"""
+    nome = entry_nome.get()
+    label_resultado.configure(text= f"bom dia, {nome}")
+
 #botão para o programa desejar "bom dia"
-botao_bom_dia = tk.Button(janela, text= "enviar")
+botao_bom_dia = tk.Button(janela, text= "enviar", command= desejar_bom_dia)
 botao_bom_dia.pack(pady= 10)
 
 #desejando o bom dia
-label_resultado = tk.Label(janela, text= "bom dia")
+label_resultado = tk.Label(janela, text= "",
+                           font=("Arial, 30"),
+                           foreground="black")
 label_resultado.pack(pady=10)
 
 #loop para manter a janela aberta

@@ -5,7 +5,7 @@ class Boot_gemini:
 
     def __init__(self):
       #self são atributos 
-      cliente = genai.configure(api_key = "AIzaSyAqylEfukRImxev0EAolWeMNmW1URQK9lQ")
+      cliente = genai.configure(api_key = "AIzaSyChFOsumu35YjUO4V_pEG74ouAbmYeqQ14")
 
       instrucao_sistema = """
             Você é um especialista em ficar em casa, com 30 anos de experiência, 

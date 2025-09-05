@@ -31,13 +31,15 @@ class janela_principal():
         self.entry_usuario = tk.Entry(self.janela,)
         self.entry_usuario.pack()
         #botão par o usuário enviar a pergunta
-        self.botao_enviar = tk.Button(self.janela, text= "PERGUNTAR")
+        self.botao_enviar = tk.Button(self.janela, text= "PERGUNTAR",
+                                      command = self.responder)
         self.botao_enviar.pack(pady = 30)
 
         #respondendo
         self.label_resposta = tk.Label(self.janela, text= "RESPOSTA",
                                 font=("Arial, 14"),
-                                foreground="black")
+                                foreground="black",
+                                wraplength=700)
         self.label_resposta.pack(pady=10)
 
         #criando o objeto robo (instancindo a classe)

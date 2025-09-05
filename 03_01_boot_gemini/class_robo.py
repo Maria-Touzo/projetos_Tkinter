@@ -4,6 +4,7 @@ class Boot_gemini:
     """Cria um robô especialista em ficar em casa"""
 
     def __init__(self):
+      #self são atributos 
       cliente = genai.configure(api_key = "AIzaSyAwxjTXssSQ9gLXB-Q9QlATJYTk78bpE0g")
 
       instrucao_sistema = """
@@ -25,3 +26,12 @@ class Boot_gemini:
         """Envia mensagem para o modelo e retorna a resposta."""
         response = self.chat.send_message(mensagem)
         return response.text
+    
+#Este if só sera executado se eu rodar o arquivo diretamente,
+#caso eu importe essa página não erá executada 
+#podemos utilizar isso para teste
+if __name__ == "__main__":
+   robo = Boot_gemini()
+   resposta = robo.responder("Quem é o hamster mais amado do Brasil?")
+   print(resposta)
+   

@@ -33,7 +33,7 @@ class Login:
         label_senha.pack(pady=10)
 
         #criando a caixa de texto senha
-        self.entry_senha = ttk.Entry()
+        self.entry_senha = ttk.Entry(show="***")
         self.entry_senha.pack(pady=10)
 
         #criando um frame
@@ -45,7 +45,7 @@ class Login:
         self.botao_login.pack(side="left", padx=10)
 
         #criando o botão sair
-        sair = ttk.Button(self.frame_botao, text= "Sair", padding=10, width=10  )
+        sair = ttk.Button(self.frame_botao, text= "Sair", padding=10, width=10, command=self.sair  )
         sair.pack(side="right")
        
     def run(self):
@@ -62,9 +62,14 @@ class Login:
             tkinter.messagebox.showinfo(title="Login realizado com sucesso", message="parabéns!")
         else:
             tkinter.messagebox.showerror(title="ERRO", message="login ou senha incorreta")
+        
     
     def sair(self):
-        exit()
+        pergunta = tkinter.messagebox.askyesno(title="Sair", message="Tem certeza que deseja sair?")
+        if pergunta == True:
+            exit()
+        else: 
+            False
     
     
 

@@ -1,5 +1,6 @@
 import ttkbootstrap as ttk
 import tkinter.messagebox
+from classe_lista_tarefas import Lista_de_tarefas
 
 class Login:
 
@@ -17,10 +18,16 @@ class Login:
         self.janela.resizable(False, False)
 
         #escrevendo "login"
-        label_usuario = ttk.Label(self.janela, text= "Login:",
+        label_login= ttk.Label(self.janela, text= "Login:",
                                         foreground="white",
-                                        font=("Arial",12 ))
+                                        font=("Arial",32 ))
+        label_login.pack(pady=10)
+
+        label_usuario= ttk.Label(self.janela, text= "Usuário:",
+                                        foreground="white",
+                                        font=("Times New Roman",12 ))
         label_usuario.pack(pady=10)
+
 
         #criando a caixa de texto usuário
         self.entry_usuario = ttk.Entry(self.janela)
@@ -29,7 +36,7 @@ class Login:
         #escrevendo "senha"
         label_senha = ttk.Label(self.janela, text= "Senha:",
                                         foreground="white",
-                                        font=("Arial",12 ))
+                                        font=("Times New Roman",12 ))
         label_senha.pack(pady=10)
 
         #criando a caixa de texto senha
@@ -59,7 +66,10 @@ class Login:
 
         #verificando o login e a senha
         if login_usuario == "Godofredo" and senha_usuario == "amogirassol":
-            tkinter.messagebox.showinfo(title="Login realizado com sucesso", message="parabéns!")
+            #tkinter.messagebox.showinfo(title="Login realizado com sucesso", message="parabéns!")
+            self.janela.destroy()
+            login = Lista_de_tarefas()
+            login.run()
         else:
             tkinter.messagebox.showerror(title="ERRO", message="login ou senha incorreta")
         

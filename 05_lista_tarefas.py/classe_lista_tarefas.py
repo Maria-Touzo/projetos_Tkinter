@@ -1,6 +1,7 @@
 import ttkbootstrap as ttk
 from tkinter import Listbox, END
-from ttkbootstrap.constants import *
+from tkinter import messagebox
+
 
 class Lista_de_tarefas:
 
@@ -39,7 +40,7 @@ class Lista_de_tarefas:
         botao_excluir = ttk.Button(frame_botao, text= "Excluir", width=50, style="danger", command=self.excluir_item)
         botao_excluir.pack(side="left", padx=10)
 
-        botao_concluir = ttk.Button(frame_botao, text= "Marcar como concluído", width=50, style="sucess")
+        botao_concluir = ttk.Button(frame_botao, text= "Marcar como concluído", width=50, style="sucess", command=self.tarefa_concluida)
         botao_concluir.pack(side="right", padx=10)
 
     def adicionar_tarefa(self):
@@ -50,7 +51,23 @@ class Lista_de_tarefas:
         self.lista.insert('end', tarefa)
 
     def excluir_item (self):
-         self.lista.delete(self.lista.curselection())
+         excluir_indice = self.lista.curselection()
+
+         if excluir_indice:
+            self.lista.delete(excluir_indice)
+         else:
+            messagebox.showerror(title="Erro", message="Por favor, selecione um ítem para excluir!")
+
+    def tarefa_concluida(self):
+        marcar_tarefa_concluida = self.lista.curselection()
+
+        if marcar_tarefa_concluida:
+            texto_lista = self.lista.get(marcar_tarefa_concluida)
+            self.lista.delete(marcar_tarefa_concluida)
+            self.lista.insert(marcar_tarefa_concluida, texto_lista + "[Concluido]")
+        else:
+             messagebox.showerror(title="Erro", message="Por favor, selecione um ítem para marcar!")
+
     
     def run(self):
         self.janela.mainloop()

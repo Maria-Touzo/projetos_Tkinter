@@ -1,4 +1,6 @@
 import ttkbootstrap as ttk
+from tkinter import Listbox, END
+from ttkbootstrap.constants import *
 
 class Lista_de_tarefas:
 
@@ -16,12 +18,43 @@ class Lista_de_tarefas:
                                  foreground="black",
                                  font=("Times New Roman", 32))
         label_título.pack()
+
+        #criando umframe
+        frame_add = ttk.Frame(self.janela)
+        frame_add.pack(fill= "x", padx=10)
         #criando a caixa de texto 
-        self.entry_adicionar = ttk.Entry()
-        self.entry_adicionar.pack(pady=20)
+        self.add_tarefa = ttk.Entry(frame_add)
+        self.add_tarefa.pack(side="left",pady=20, expand=True, fill= "x")
+
+        #criando o botão login
+        self.botao_add = ttk.Button(frame_add, text= "Adicionar", command=self.adicionar_tarefa)
+        self.botao_add.pack(side="right",padx= 10)
+
+        self.lista = Listbox(self.janela, font=("Times New Roman",12), height=10)
+        self.lista.pack(pady=20, padx=20, fill='both', expand = True)
+
+        frame_botao = ttk.Frame(self.janela)
+        frame_botao.pack(side="bottom", padx=20, pady=20)
+
+        botao_excluir = ttk.Button(frame_botao, text= "Excluir", width=50, style="danger", command=self.excluir_item)
+        botao_excluir.pack(side="left", padx=10)
+
+        botao_concluir = ttk.Button(frame_botao, text= "Marcar como concluído", width=50, style="sucess")
+        botao_concluir.pack(side="right", padx=10)
+
+    def adicionar_tarefa(self):
+        #pegando o texto da caixa de textp
+        tarefa = self.add_tarefa.get()
+
+        #inserindo a tarfa na lista
+        self.lista.insert('end', tarefa)
+
+    def excluir_item (self):
+         self.lista.delete(self.lista.curselection())
     
     def run(self):
         self.janela.mainloop()
+
     
 if __name__ == "__main__":
     janela = Lista_de_tarefas()

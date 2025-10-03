@@ -1,6 +1,7 @@
 import ttkbootstrap as ttk
 from tkinter import Listbox, END
 from tkinter import messagebox
+import sqlite3
 
 
 class Lista_de_tarefas:
@@ -20,7 +21,7 @@ class Lista_de_tarefas:
                                  font=("Times New Roman", 32))
         label_título.pack()
 
-        #criando umframe
+        #criando um frame
         frame_add = ttk.Frame(self.janela)
         frame_add.pack(fill= "x", padx=10)
         #criando a caixa de texto 
@@ -42,6 +43,25 @@ class Lista_de_tarefas:
 
         botao_concluir = ttk.Button(frame_botao, text= "Marcar como concluído", width=50, style="sucess", command=self.tarefa_concluida)
         botao_concluir.pack(side="right", padx=10)
+
+        #fazendo conexão com o banco de dados
+        conexao = sqlite3.connect("05_lista_tarefas/bd_lista_tarefa.sqlite")
+        #criando o cursor (quem fica responsável pelo banco de dados)
+        cursor = conexao.cursor()
+        #criando uma tabela pro banco de dados
+        sql_para_criar_tabela = """
+                          CREATE TABLE tarefas (
+                          codigo integer primary key autoincrement, 
+                          tarefa varchar(200)
+                          );      
+                          """
+        #executando o banco de dados
+        cursor.execute(sql_para_criar_tabela)
+        #comitando a tebela
+        conexao.commit()
+        #fechando a conexão (não precisa necessariamente fechar o cursor, só fechando a conexão, automticamente já fecha o cursor)
+        cursor.close()
+        conexao.close()
 
     def adicionar_tarefa(self):
         #pegando o texto da caixa de textp

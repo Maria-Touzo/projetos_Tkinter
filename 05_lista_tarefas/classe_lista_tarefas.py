@@ -41,7 +41,7 @@ class Lista_de_tarefas:
         botao_excluir = ttk.Button(frame_botao, text= "Excluir", width=50, style="danger", command=self.excluir_item)
         botao_excluir.pack(side="left", padx=10)
 
-        botao_concluir = ttk.Button(frame_botao, text= "Marcar como concluído", width=50, style="sucess", command=self.tarefa_concluida)
+        botao_concluir = ttk.Button(frame_botao, text= "Marcar como concluído", width=50, style="success", command=self.tarefa_concluida)
         botao_concluir.pack(side="right", padx=10)
 
         #fazendo conexão com o banco de dados
@@ -50,18 +50,19 @@ class Lista_de_tarefas:
         cursor = conexao.cursor()
         #criando uma tabela pro banco de dados
         sql_para_criar_tabela = """
-                          CREATE TABLE tarefas (
+                          CREATE TABLE IF NOT EXISTS tarefa (
                           codigo integer primary key autoincrement, 
-                          tarefa varchar(200)
-                          );      
+                          desc_tarefa varchar(200),
+                          status integer DEFAULT 0 );      
                           """
         #executando o banco de dados
         cursor.execute(sql_para_criar_tabela)
         #comitando a tebela
         conexao.commit()
         #fechando a conexão (não precisa necessariamente fechar o cursor, só fechando a conexão, automticamente já fecha o cursor)
-        cursor.close()
         conexao.close()
+
+        
 
     def adicionar_tarefa(self):
         #pegando o texto da caixa de textp
@@ -69,6 +70,50 @@ class Lista_de_tarefas:
 
         #inserindo a tarfa na lista
         self.lista.insert('end', tarefa)
+
+    #conenctado com o banco de dados
+        conexao = sqlite3.connect("05_lista_tarefas/bd_lista_tarefa.sqlite")
+    #conectando o cursor
+        cursor = conexao.cursor()
+        """cursor que comanda o banco de dados"""
+    #inserindo tarefas no banco de dados
+        sql_insert = """
+                       INSERT INTO tarefa (desc_tarefa)
+                       VALUES (?);
+                       
+                       """
+        #executando as tarefas inseridas 
+        cursor.execute(sql_insert,[tarefa])
+        #comitando
+        conexao.commit()
+        #fechando conexão
+        conexao.close()
+        
+
+    def atualizar_lista(self):
+        #conectando ao banco de dados    
+        conexao = sqlite3.connect("05_lista_tarefas/bd_lista_tarefa.sqlite")
+        #conectando o cursor
+        cursor = conexao.cursor()
+        #selecionando as tarefas 
+        sql_selecionar_tarefas = """ SELECT codigo, desc_tarefa 
+                                    FROM tarefa; """
+
+        cursor.execute(sql_selecionar_tarefas)
+        # executando a criação de tabela
+        lista_de_tarefas = cursor.fetchall()
+
+        conexao.commit()
+        # comitando alterações no banco de dados
+
+        conexao.close()
+
+        # inserindo itens na listbox
+        
+        for linha in lista_de_tarefas:
+            self.lista.insert('end', linha[1])
+
+        self.atualizar_lista()
 
     def excluir_item (self):
          excluir_indice = self.lista.curselection()
@@ -80,13 +125,33 @@ class Lista_de_tarefas:
 
     def tarefa_concluida(self):
         marcar_tarefa_concluida = self.lista.curselection()
+       #pegando a tarefa
+        self.texto_lista = self.lista.get(marcar_tarefa_concluida)
+            
+        #self.lista.delete(0, END)
+        #conectando ao banc de dados 
+        conexao = sqlite3.connect("05_lista_tarefas//bd_lista_tarefa.sqlite")
+        cursor = conexao.cursor()
+        #selecionando tarefa e realizand o UPDATE
+        sql_selecionar_tarefas = """ 
+        UPDATE tarefa SET status = 1 
+        WHERE marcar_tarefa_concuida; 
+        """
+        #executando as tarefas selecionadas 
+        cursor.execute(sql_selecionar_tarefas)
+        Lista_de_tarefas = cursor.fetchall()
+        conexao.commit()
+        conexao.close()
 
-        if marcar_tarefa_concluida:
-            texto_lista = self.lista.get(marcar_tarefa_concluida)
-            self.lista.delete(marcar_tarefa_concluida)
-            self.lista.insert(marcar_tarefa_concluida, texto_lista + "[Concluido]")
+
+        for linha in Lista_de_tarefas:
+            tarefa, status = linha
+        if status == 1:
+            texto = tarefa + " [Concluído]"
         else:
-             messagebox.showerror(title="Erro", message="Por favor, selecione um ítem para marcar!")
+            texto = tarefa
+            
+        self.lista.insert('end', texto)
 
     
     def run(self):

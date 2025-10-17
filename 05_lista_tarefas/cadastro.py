@@ -33,5 +33,5 @@ class Janela_cadastro:
         self.janela_cadastro.mainloop()
 
 if __name__ == "__main__":
-    Janela_cadastro = Janela_cadastro("")
+    Janela_cadastro = Janela_cadastro(ttk.Window(themename="minty"))
     Janela_cadastro.run()

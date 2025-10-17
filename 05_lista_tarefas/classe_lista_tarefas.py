@@ -1,6 +1,7 @@
 import ttkbootstrap as ttk
 from tkinter import Listbox, END
 from tkinter import messagebox
+from classe_login import Login
 import sqlite3
 
 
@@ -45,24 +46,27 @@ class Lista_de_tarefas:
         botao_concluir.pack(side="right", padx=10)
 
         #fazendo conexão com o banco de dados
-        conexao = sqlite3.connect("05_lista_tarefas/bd_lista_tarefa.sqlite")
+        conexao = sqlite3.connect("./bd_lista_tarefa.sqlite")
         #criando o cursor (quem fica responsável pelo banco de dados)
         cursor = conexao.cursor()
         #criando uma tabela pro banco de dados
-        sql_para_criar_tabela = """
+        criar_tabela = """
                           CREATE TABLE IF NOT EXISTS tarefa (
                           codigo integer primary key autoincrement, 
                           desc_tarefa varchar(200),
                           status integer DEFAULT 0 );      
                           """
         #executando o banco de dados
-        cursor.execute(sql_para_criar_tabela)
+        cursor.execute(criar_tabela)
         #comitando a tebela
         conexao.commit()
         #fechando a conexão (não precisa necessariamente fechar o cursor, só fechando a conexão, automticamente já fecha o cursor)
         conexao.close()
 
-        
+        janela_login = Login(self.janela)  
+
+        #escondendo a janela da lista tarefas
+        self.janela.withdraw()      
 
     def adicionar_tarefa(self):
         #pegando o texto da caixa de textp
@@ -72,7 +76,7 @@ class Lista_de_tarefas:
         self.lista.insert('end', tarefa)
 
     #conenctado com o banco de dados
-        conexao = sqlite3.connect("05_lista_tarefas/bd_lista_tarefa.sqlite")
+        conexao = sqlite3.connect("./bd_lista_tarefa.sqlite")
     #conectando o cursor
         cursor = conexao.cursor()
         """cursor que comanda o banco de dados"""
@@ -88,11 +92,16 @@ class Lista_de_tarefas:
         conexao.commit()
         #fechando conexão
         conexao.close()
+
+        #abrindo a janela de login
+        # Login(self.janela)
+
+        self.atualizar_lista()
         
 
     def atualizar_lista(self):
         #conectando ao banco de dados    
-        conexao = sqlite3.connect("05_lista_tarefas/bd_lista_tarefa.sqlite")
+        conexao = sqlite3.connect("./bd_lista_tarefa.sqlite")
         #conectando o cursor
         cursor = conexao.cursor()
         #selecionando as tarefas 
@@ -113,7 +122,7 @@ class Lista_de_tarefas:
         for linha in lista_de_tarefas:
             self.lista.insert('end', linha[1])
 
-        self.atualizar_lista()
+       
 
     def excluir_item (self):
          excluir_indice = self.lista.curselection()
@@ -130,12 +139,13 @@ class Lista_de_tarefas:
             
         #self.lista.delete(0, END)
         #conectando ao banc de dados 
-        conexao = sqlite3.connect("05_lista_tarefas//bd_lista_tarefa.sqlite")
+        conexao = sqlite3.connect("./bd_lista_tarefa.sqlite")
         cursor = conexao.cursor()
         #selecionando tarefa e realizand o UPDATE
         sql_selecionar_tarefas = """ 
-        UPDATE tarefa SET status = 1 
-        WHERE marcar_tarefa_concuida; 
+        UPDATE  tarefa
+        SET status = "concluido"
+        WHERE desc_tarefa = 1;
         """
         #executando as tarefas selecionadas 
         cursor.execute(sql_selecionar_tarefas)
@@ -145,11 +155,11 @@ class Lista_de_tarefas:
 
 
         for linha in Lista_de_tarefas:
-            tarefa, status = linha
-        if status == 1:
-            texto = tarefa + " [Concluído]"
+            desc_tarefa, status = linha
+        if sql_selecionar_tarefas == 1:
+            texto = desc_tarefa + " [Concluído]"
         else:
-            texto = tarefa
+            texto = desc_tarefa
             
         self.lista.insert('end', texto)
 

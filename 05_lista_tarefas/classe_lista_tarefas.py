@@ -93,8 +93,6 @@ class Lista_de_tarefas:
        #fechando conexão
          conexao.close()
 
-        #abrindo a janela de login
-         Login(self.janela)
 
          self.atualizar_lista()
         

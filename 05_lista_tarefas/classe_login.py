@@ -1,5 +1,6 @@
 import sqlite3
 import ttkbootstrap as ttk
+from tkinter import messagebox
 import tkinter.messagebox
 from cadastro import Janela_cadastro
 
@@ -88,25 +89,27 @@ class Login:
             """, 
             [login_usuario, senha_usuario]
         )
-        conexao.commit()
+        resultado = cursor.fetchone()
         conexao.close()
 
         #verificando o login e a senha
-        if login_usuario == "Godofredo" and senha_usuario == "amogirassol":
-            #tkinter.messagebox.showinfo(title="Login realizado com sucesso", message="parabéns!")
+        # Se o resultado for diferente de vazio, ou seja, ele encontrou alguém com essa informação
+        # eu abro a lista de tarefas
+        if resultado != None:
+            messagebox.showinfo(title="Login realizado com sucesso", message=f"Seja bem-vindo, {resultado[0]}!")
             self.janela.destroy()
             #reexibe a janela principal, janela de tarefas 
             self.janela_pai.deiconify()
             self.janela_pai.wm_state("zoomed")
         else:
-            tkinter.messagebox.showerror(title="ERRO", message="login ou senha incorreta")
+           messagebox.showerror(title="ERRO", message="login ou senha incorreta")
 
     def abrir_tela_cadastro(self):
         Janela_cadastro(self.janela)
         
     
     def sair(self):
-        pergunta = tkinter.messagebox.askyesno(title="Sair", message="Tem certeza que deseja sair?")
+        pergunta = messagebox.askyesno("Sair", "Tem certeza que deseja sair?")
         if pergunta == True:
             exit()
         else: 

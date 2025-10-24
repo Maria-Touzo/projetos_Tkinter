@@ -1,5 +1,7 @@
+import sqlite3
 import ttkbootstrap as ttk
 import tkinter.messagebox
+from cadastro import Janela_cadastro
 
 
 class Login:
@@ -62,6 +64,12 @@ class Login:
         #criando o botão sair
         sair = ttk.Button( self.frame_botao, text= "Sair", padding=10, width=10, command=self.sair  )
         sair.pack(side="right")
+
+        cadastrar = ttk.Button(self.janela,
+                               text="CADASTRAR",
+                               style="Primary",
+                               command=self.abrir_tela_cadastro)
+        cadastrar.pack()
        
     def run(self):
         """Iniciar a janela"""
@@ -72,6 +80,17 @@ class Login:
         senha_usuario = self.entry_senha.get()
         login_usuario = self.entry_usuario.get()
 
+        conexao = sqlite3.connect("05_lista_tarefas/bd_lista_tarefa.sqlite")
+        cursor = conexao.cursor()
+        cursor.execute(
+            """SELECT nome, usuario, senha FROM usuario
+                WHERE nome= ? AND senha = ?;
+            """, 
+            [login_usuario, senha_usuario]
+        )
+        conexao.commit()
+        conexao.close()
+
         #verificando o login e a senha
         if login_usuario == "Godofredo" and senha_usuario == "amogirassol":
             #tkinter.messagebox.showinfo(title="Login realizado com sucesso", message="parabéns!")
@@ -81,6 +100,9 @@ class Login:
             self.janela_pai.wm_state("zoomed")
         else:
             tkinter.messagebox.showerror(title="ERRO", message="login ou senha incorreta")
+
+    def abrir_tela_cadastro(self):
+        Janela_cadastro(self.janela)
         
     
     def sair(self):
@@ -93,5 +115,5 @@ class Login:
     
 
 if __name__ == "__main__":
-    janela = Login()
+    janela = Login(ttk.Window)
     janela.run()

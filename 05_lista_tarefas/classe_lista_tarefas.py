@@ -46,17 +46,17 @@ class Lista_de_tarefas:
         botao_concluir.pack(side="right", padx=10)
 
         #fazendo conexão com o banco de dados
-        conexao = sqlite3.connect("./bd_lista_tarefa.sqlite")
+        conexao = sqlite3.connect("05_lista_tarefas/bd_lista_tarefa.sqlite")
         #criando o cursor (quem fica responsável pelo banco de dados)
         cursor = conexao.cursor()
-        #criando uma tabela pro banco de dados
+        # criando uma tabela pro banco de dados
         criar_tabela = """
                           CREATE TABLE IF NOT EXISTS tarefa (
-                          codigo integer primary key autoincrement, 
-                          desc_tarefa varchar(200),
-                          status integer DEFAULT 0 );      
-                          """
-        #executando o banco de dados
+                           codigo integer primary key autoincrement, 
+                           desc_tarefa varchar(200)
+                      );      
+                           """
+        # executando o banco de dados
         cursor.execute(criar_tabela)
         #comitando a tebela
         conexao.commit()
@@ -69,39 +69,39 @@ class Lista_de_tarefas:
         self.janela.withdraw()      
 
     def adicionar_tarefa(self):
-        #pegando o texto da caixa de textp
-        tarefa = self.add_tarefa.get()
+    #     #pegando o texto da caixa de textp
+         tarefa = self.add_tarefa.get()
 
-        #inserindo a tarfa na lista
-        self.lista.insert('end', tarefa)
+    #     #inserindo a tarfa na lista
+         self.lista.insert('end', tarefa)
 
-    #conenctado com o banco de dados
-        conexao = sqlite3.connect("./bd_lista_tarefa.sqlite")
-    #conectando o cursor
-        cursor = conexao.cursor()
-        """cursor que comanda o banco de dados"""
-    #inserindo tarefas no banco de dados
-        sql_insert = """
+    # #conenctado com o banco de dados
+         conexao = sqlite3.connect("05_lista_tarefas/bd_lista_tarefa.sqlite")
+    # #conectando o cursor
+         cursor = conexao.cursor()
+         """cursor que comanda o banco de dados"""
+    # #inserindo tarefas no banco de dados
+         sql_insert = """
                        INSERT INTO tarefa (desc_tarefa)
-                       VALUES (?);
+                      VALUES (?);
                        
-                       """
-        #executando as tarefas inseridas 
-        cursor.execute(sql_insert,[tarefa])
-        #comitando
-        conexao.commit()
-        #fechando conexão
-        conexao.close()
+                        """
+    #     #executando as tarefas inseridas 
+         cursor.execute(sql_insert, [tarefa])
+    #     comitando
+         conexao.commit()
+       #fechando conexão
+         conexao.close()
 
         #abrindo a janela de login
-        # Login(self.janela)
+         Login(self.janela)
 
-        self.atualizar_lista()
+         self.atualizar_lista()
         
 
     def atualizar_lista(self):
         #conectando ao banco de dados    
-        conexao = sqlite3.connect("./bd_lista_tarefa.sqlite")
+        conexao = sqlite3.connect("05_lista_tarefas/bd_lista_tarefa.sqlite")
         #conectando o cursor
         cursor = conexao.cursor()
         #selecionando as tarefas 
@@ -125,44 +125,49 @@ class Lista_de_tarefas:
        
 
     def excluir_item (self):
-         excluir_indice = self.lista.curselection()
+        excluir_indice = self.lista.curselection()
 
-         if excluir_indice:
-            self.lista.delete(excluir_indice)
-         else:
+        if excluir_indice:
+            self.lista.delete(excluir_indice[0])
+
+            conexao = sqlite3.connect("05_lista_tarefas/bd_lista_tarefa.sqlite")
+            cursor = conexao.cursor()
+            sql_delete = """DELETE FROM tarefa
+                            WHERE tarefa = desc_tarefa"""
+            cursor.execute(sql_delete[1])
+            conexao.close()
+            cursor.close()
+        else:
             messagebox.showerror(title="Erro", message="Por favor, selecione um ítem para excluir!")
 
     def tarefa_concluida(self):
         marcar_tarefa_concluida = self.lista.curselection()
        #pegando a tarefa
         self.texto_lista = self.lista.get(marcar_tarefa_concluida)
+        
+        if "[CONCLUÍDO]" not in self.texto_lista:
+            self.lista.delete(marcar_tarefa_concluida[0])
+            texto_concluido = self.texto_lista + "[CONCLUÍDO]"
+            self.lista.insert(marcar_tarefa_concluida[0], texto_concluido)
+
+            conexao = sqlite3.connect("05_lista_tarefas/bd_lista_tarefa.sqlite")
+            cursor = conexao.cursor()
+
+            update = """
+                     UPDATE tarefa 
+                     SET desc_tarefa = ?
+                     WHERE desc_tarefa = ?"""
             
-        #self.lista.delete(0, END)
-        #conectando ao banc de dados 
-        conexao = sqlite3.connect("./bd_lista_tarefa.sqlite")
-        cursor = conexao.cursor()
-        #selecionando tarefa e realizand o UPDATE
-        sql_selecionar_tarefas = """ 
-        UPDATE  tarefa
-        SET status = "concluido"
-        WHERE desc_tarefa = 1;
-        """
-        #executando as tarefas selecionadas 
-        cursor.execute(sql_selecionar_tarefas)
-        Lista_de_tarefas = cursor.fetchall()
-        conexao.commit()
-        conexao.close()
+            valores = (texto_concluido,self.texto_lista)
+            cursor.execute(update, valores)
 
+            conexao.commit()
+            cursor.close()
+            conexao.close()
 
-        for linha in Lista_de_tarefas:
-            desc_tarefa, status = linha
-        if sql_selecionar_tarefas == 1:
-            texto = desc_tarefa + " [Concluído]"
         else:
-            texto = desc_tarefa
-            
-        self.lista.insert('end', texto)
-
+            messagebox.showerror("erro", "você deve selecionar a tarefa para marcá-la")
+        
     
     def run(self):
         self.janela.mainloop()

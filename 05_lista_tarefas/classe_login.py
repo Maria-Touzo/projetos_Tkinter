@@ -7,14 +7,16 @@ from cadastro import Janela_cadastro
 
 class Login:
 
-    def __init__(self, janela_pai):
+    def __init__(self, classe_pai):
 
         #estou transformando o parametro e atributo para poder 
         # usar em qualquer método (função)
-        self.janela_pai = janela_pai
+
+        self.janela_pai = classe_pai.janela
+        self.classe_pai = classe_pai
 
         #criando a janela
-        self.janela = ttk.Toplevel(janela_pai)
+        self.janela = ttk.Toplevel(self.janela_pai)
 
         #título janela
         self.janela.title("Lista de tarefas ")
@@ -85,7 +87,7 @@ class Login:
         cursor = conexao.cursor()
         cursor.execute(
             """SELECT nome, usuario, senha FROM usuario
-                WHERE nome= ? AND senha = ?;
+                WHERE usuario = ? AND senha = ?;
             """, 
             [login_usuario, senha_usuario]
         )
@@ -101,6 +103,9 @@ class Login:
             #reexibe a janela principal, janela de tarefas 
             self.janela_pai.deiconify()
             self.janela_pai.wm_state("zoomed")
+            self.classe_pai.usuario_logado = login_usuario
+            #atualizando a lista de tarefas 
+            self.classe_pai.atualizar_lista()
         else:
            messagebox.showerror(title="ERRO", message="login ou senha incorreta")
 

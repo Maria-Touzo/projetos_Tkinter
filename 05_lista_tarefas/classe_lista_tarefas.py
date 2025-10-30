@@ -8,6 +8,9 @@ import sqlite3
 class Lista_de_tarefas:
 
     def __init__(self):
+
+        #usuario que está logado
+        self.usuario_logado = None
         #criando a janela
         self.janela = ttk.Window(themename= "minty")
         #título janela
@@ -53,7 +56,9 @@ class Lista_de_tarefas:
         criar_tabela = """
                           CREATE TABLE IF NOT EXISTS tarefa (
                            codigo integer primary key autoincrement, 
-                           desc_tarefa varchar(200)
+                           desc_tarefa varchar(200),
+                           usuario VARCHAR(20)
+                       
                       );      
                            """
         # executando o banco de dados
@@ -63,7 +68,7 @@ class Lista_de_tarefas:
         #fechando a conexão (não precisa necessariamente fechar o cursor, só fechando a conexão, automticamente já fecha o cursor)
         conexao.close()
 
-        janela_login = Login(self.janela)  
+        Login(self)
 
         #escondendo a janela da lista tarefas
         self.janela.withdraw()      
@@ -82,12 +87,12 @@ class Lista_de_tarefas:
          """cursor que comanda o banco de dados"""
     # #inserindo tarefas no banco de dados
          sql_insert = """
-                       INSERT INTO tarefa (desc_tarefa)
-                      VALUES (?);
+                       INSERT INTO tarefa (desc_tarefa, usuario)
+                      VALUES (?, ?);
                        
                         """
     #     #executando as tarefas inseridas 
-         cursor.execute(sql_insert, [tarefa])
+         cursor.execute(sql_insert, [tarefa, self.usuario_logado])
     #     comitando
          conexao.commit()
        #fechando conexão
@@ -98,15 +103,17 @@ class Lista_de_tarefas:
         
 
     def atualizar_lista(self):
+
+        self.lista.delete(0, "end")
         #conectando ao banco de dados    
         conexao = sqlite3.connect("05_lista_tarefas/bd_lista_tarefa.sqlite")
         #conectando o cursor
         cursor = conexao.cursor()
         #selecionando as tarefas 
         sql_selecionar_tarefas = """ SELECT codigo, desc_tarefa 
-                                    FROM tarefa; """
+                                    FROM tarefa WHERE usuario = ?; """
 
-        cursor.execute(sql_selecionar_tarefas)
+        cursor.execute(sql_selecionar_tarefas,[self.usuario_logado])
         # executando a criação de tabela
         lista_de_tarefas = cursor.fetchall()
 

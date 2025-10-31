@@ -18,12 +18,14 @@ def adicionar_vinho():
     conexao.close()
 
 def deletar_vinho():
+    #selecionando o ítem para remoção
     item_selecionado = treeview.selection()
-    treeview.delete(item_selecionado)
-   
+    #pegando os valores da linha
     valores_selecionados = treeview.item(item_selecionado, "values")
+    #atribuindo o id = 0
     id_vinho = valores_selecionados[0]
-
+    #deletando
+    treeview.delete(item_selecionado)
     # Conecta ao banco e deleta o registro
     conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
     cursor = conexao.cursor()

@@ -97,8 +97,6 @@ class Lista_de_tarefas:
          conexao.commit()
        #fechando conexão
          conexao.close()
-
-
          self.atualizar_lista()
         
 

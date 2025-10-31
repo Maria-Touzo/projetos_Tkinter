@@ -16,24 +16,33 @@ def adicionar_vinho():
     cursor.execute(sql_insert,adicionar)
     conexao.commit()
     conexao.close()
+    atualizar_treeview()
 
 def deletar_vinho():
-    #selecionando o ítem para remoção
+ #selecionando o ítem para remoção
     item_selecionado = treeview.selection()
-    #pegando os valores da linha
-    valores_selecionados = treeview.item(item_selecionado, "values")
-    #atribuindo o id = 0
-    id_vinho = valores_selecionados[0]
-    #deletando
-    treeview.delete(item_selecionado)
-    # Conecta ao banco e deleta o registro
-    conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
-    cursor = conexao.cursor()
-    cursor.execute("DELETE FROM vinho WHERE id = ?", (id_vinho))
-    conexao.commit()
-    conexao.close()
+    if item_selecionado:
+        #pegando os valores da linha
+        valores_selecionados = treeview.item(item_selecionado, "values")
+        #atribuindo o id = 0
+        id_vinho = valores_selecionados[0]
+        #deletando
+        treeview.delete(item_selecionado)
+        # Conecta ao banco e deleta o registro
+        conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
+        cursor = conexao.cursor()
+        cursor.execute("DELETE FROM vinho WHERE id = ?", [id_vinho])
+        conexao.commit()
+        conexao.close()
+    else:
+        messagebox.showerror(title="Erro", message="Por favor, selecione um ítem para excluir!")
+
 
 def atualizar_treeview():
+
+    for linha in treeview.get_children():
+        treeview.delete(linha)
+    
     conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
     cursor = conexao.cursor()
     sql_select = """SELECT id, nome_vinho, regiao_pais, tipo, ano_colheita, qtde_stock FROM vinho;"""
@@ -44,6 +53,32 @@ def atualizar_treeview():
 
     for linha in resultado:
         treeview.insert("","end",values =linha)
+
+def avaliacao():
+
+    item_selecionado = treeview.selection()
+    if not item_selecionado:
+        messagebox.showerror("ERRO!", "Para avaliar, você tem que selecionar um ítem")
+        return
+    janela_2 = ttk.Toplevel(janela)
+    janela_2.title("Avaliação")
+    janela_2.wm_state("zoomed")
+    janela.resizable(False,False)
+
+    ttk.Label(janela_2, text="Avalie o vinho", font=("Helvetica", 14, "bold")).pack(pady=10)
+    ttk.Entry(janela_2, width=30).pack(pady=10)
+    ttk.Button(janela_2, text="Salvar avaliação", bootstyle="success").pack(pady=10)
+
+    conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
+    cursor = conexao.cursor()
+    criar_tabela = """
+        CREATE TABLE IF NOT EXISTS avaliacao (
+               
+               );
+"""
+    cursor.execute(criar_tabela)
+    conexao.commit()
+    conexao.close()
 
 
 
@@ -114,7 +149,7 @@ treeview.heading("qtde_stock", text="Quantidade stock")
 
 ttk.Button(janela, text="DELETAR", padding=10, width=16, command=deletar_vinho).pack(pady=10)
 
-ttk.Button(janela, text="AVALIAR", padding=10, width=16, command="").pack()
+ttk.Button(janela, text="AVALIAR", padding=10, width=16, command=avaliacao).pack()
 
 
 conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")

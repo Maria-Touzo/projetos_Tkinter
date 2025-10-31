@@ -1,7 +1,49 @@
 import ttkbootstrap as ttk
+import sqlite3
+import tkinter
+from tkinter import messagebox
+
 
 def adicionar_vinho():
     adicionar = [nome_vinho.get(), local.get(), tipo_vinho.get(), ano_colheita.get(), qtde_stock.get()]
+
+    conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
+    cursor = conexao.cursor()
+    sql_insert = """
+                    INSERT INTO vinho (nome_vinho, regiao_pais, tipo, ano_colheita, qtde_stock)
+                    VALUES (?, ?, ?, ?, ?);
+                    """
+    cursor.execute(sql_insert,adicionar)
+    conexao.commit()
+    conexao.close()
+
+def deletar_vinho():
+    item_selecionado = treeview.selection()
+    treeview.delete(item_selecionado)
+   
+    valores_selecionados = treeview.item(item_selecionado, "values")
+    id_vinho = valores_selecionados[0]
+
+    # Conecta ao banco e deleta o registro
+    conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
+    cursor = conexao.cursor()
+    cursor.execute("DELETE FROM vinho WHERE id = ?", (id_vinho))
+    conexao.commit()
+    conexao.close()
+
+def atualizar_treeview():
+    conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
+    cursor = conexao.cursor()
+    sql_select = """SELECT id, nome_vinho, regiao_pais, tipo, ano_colheita, qtde_stock FROM vinho;"""
+    cursor.execute(sql_select)
+    resultado = cursor.fetchall()
+    conexao.commit()
+    conexao.close()
+
+    for linha in resultado:
+        treeview.insert("","end",values =linha)
+
+
 
 janela = ttk.Window(themename="minty")
 
@@ -45,28 +87,49 @@ ttk.Label(janela, text="Quantidade stock:",
 qtde_stock= ttk.Entry(janela)
 qtde_stock.pack(pady=10, fill= "x", padx=10)
 
-ttk.Button(janela, text="ADICIONAR",  padding=10, width=16, command="").pack(pady=10)
+ttk.Button(janela, text="ADICIONAR",  padding=10, width=16, command=adicionar_vinho).pack(pady=10)
 
 #criando a janela do treeview
 treeview = ttk.Treeview(janela)
 treeview.pack(pady=15)
 
 #cria as colounas, ma não mostra elas na tela
-treeview["columns"] = ("nome_vinho", "pais", "tipo", "ano_colheita", "qtde_stock")
+treeview["columns"] = ("id","nome_vinho", "pais", "tipo", "ano_colheita", "qtde_stock")
 #se eu não quiser a coluna que vem por padrão
 treeview["show"] = "headings"
 
 #para mostrar os nomes na tela
 #0 já vem por padrão, INUTIL
 # treeview.heading("#0", text="coluna chata")
+treeview.heading("id", text="id")
 treeview.heading("nome_vinho", text="nome completo")
 treeview.heading("pais", text="País/Região")
 treeview.heading("tipo", text="Tipos do vinho")
 treeview.heading("ano_colheita", text="Ano da colheita")
 treeview.heading("qtde_stock", text="Quantidade stock")
 
-ttk.Button(janela, text="DELETAR", padding=10, width=16, command="").pack(pady=10)
+
+
+ttk.Button(janela, text="DELETAR", padding=10, width=16, command=deletar_vinho).pack(pady=10)
 
 ttk.Button(janela, text="AVALIAR", padding=10, width=16, command="").pack()
-janela.mainloop() 
 
+
+conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
+cursor = conexao.cursor()
+criar_tabela = """
+        CREATE TABLE IF NOT EXISTS vinho (
+               id   INTEGER PRIMARY KEY AUTOINCREMENT,
+               nome_vinho VARCHAR(20),
+               regiao_pais VARCHAR(20),
+               tipo VARCHAR (20),
+               ano_colheita INT,
+               qtde_stock INT
+               );
+"""
+cursor.execute(criar_tabela)
+conexao.commit()
+conexao.close()
+
+atualizar_treeview()
+janela.mainloop() 

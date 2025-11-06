@@ -82,7 +82,7 @@ def avaliacao():
     sabor.pack( fill= "x", padx=10)
 
 
-    ttk.Button(janela_2, text="Salvar avaliação", bootstyle="success", command=salvar_avaliacao).pack(pady=10)
+    ttk.Button(janela_2, text="Salvar avaliação",  command=salvar_avaliacao).pack(pady=10)
 
     conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
     cursor = conexao.cursor()

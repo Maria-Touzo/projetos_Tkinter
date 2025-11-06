@@ -17,6 +17,8 @@ def adicionar_vinho():
     conexao.commit()
     conexao.close()
     atualizar_treeview()
+    
+    
 
 def deletar_vinho():
  #selecionando o ítem para remoção
@@ -71,6 +73,7 @@ def avaliacao():
                anchor= "w",
             font=50).pack(fill= "x", padx=20, pady=10)
     
+    global aroma    
     aroma = ttk.Entry(janela_2)
     aroma.pack( fill= "x", padx=10)
 
@@ -78,6 +81,7 @@ def avaliacao():
                anchor= "w",
             font=50).pack(fill= "x", padx=20, pady=10)
     
+    global sabor
     sabor = ttk.Entry(janela_2)
     sabor.pack( fill= "x", padx=10)
 
@@ -89,8 +93,9 @@ def avaliacao():
     tabela = """
         CREATE TABLE IF NOT EXISTS avaliacao (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id_vinho INT,
         aroma FLOAT,
-        sabor FLOAT
+        paladar FLOAT
                );
 """ 
     cursor.execute(tabela)
@@ -98,17 +103,27 @@ def avaliacao():
     conexao.close()
 
 def salvar_avaliacao():
-    avaliacao  = [aroma.get(), sabor.get()]
+    global aroma
+    global sabor
+
+    index_selecionado = treeview.selection()
+    linha_selecionada = treeview.item(index_selecionado)
+    id_vinho = linha_selecionada['values'][0]
+
+
+    avaliacao  = [id_vinho, aroma.get(), sabor.get()]
 
     conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
     cursor = conexao.cursor()
     sql_insert = """
-                    INSERT INTO avaliacao ( aroma , sabor )
-                    VALUES (?, ?, ?, ?, ?);
+                    INSERT INTO avaliacao (id_vinho, aroma , paladar )
+                    VALUES (?, ?, ?);
                     """
     cursor.execute(sql_insert,avaliacao)
     conexao.commit()
     conexao.close()
+
+    messagebox.showinfo ( title = "Salvo" , message = "A sua avaliação foi salva com sucesso!" ) 
 
 
 
@@ -118,7 +133,7 @@ janela.title("Degustação de vinhos")
             
 janela.wm_state("zoomed")
 
-janela.resizable(False, False)
+janela.resizable(False, False)  
 
 ttk.Label(janela, text="Nome do vinho",
           font=50).pack(fill= "x", padx=20, pady=10)
@@ -199,4 +214,9 @@ conexao.commit()
 conexao.close()
 
 atualizar_treeview()
+
+#caixinhas da janela avaliacao
+aroma = None
+sabor = None
+
 janela.mainloop() 

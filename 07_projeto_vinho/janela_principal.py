@@ -65,18 +65,48 @@ def avaliacao():
     janela_2.wm_state("zoomed")
     janela.resizable(False,False)
 
-    ttk.Label(janela_2, text="Avalie o vinho", font=("Helvetica", 14, "bold")).pack(pady=10)
-    ttk.Entry(janela_2, width=30).pack(pady=10)
-    ttk.Button(janela_2, text="Salvar avaliação", bootstyle="success").pack(pady=10)
+    ttk.Label(janela_2, text="Avalie o vinho com valores de 0 a 100", font=("Helvetica", 14,"bold")).pack(pady=10)
+   
+    ttk.Label(janela_2, text="Aroma",
+               anchor= "w",
+            font=50).pack(fill= "x", padx=20, pady=10)
+    
+    aroma = ttk.Entry(janela_2)
+    aroma.pack( fill= "x", padx=10)
+
+    ttk.Label(janela_2, text="Sabor",
+               anchor= "w",
+            font=50).pack(fill= "x", padx=20, pady=10)
+    
+    sabor = ttk.Entry(janela_2)
+    sabor.pack( fill= "x", padx=10)
+
+
+    ttk.Button(janela_2, text="Salvar avaliação", bootstyle="success", command=salvar_avaliacao).pack(pady=10)
 
     conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
     cursor = conexao.cursor()
-    criar_tabela = """
+    tabela = """
         CREATE TABLE IF NOT EXISTS avaliacao (
-               
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        aroma FLOAT,
+        sabor FLOAT
                );
-"""
-    cursor.execute(criar_tabela)
+""" 
+    cursor.execute(tabela)
+    conexao.commit()
+    conexao.close()
+
+def salvar_avaliacao():
+    avaliacao  = [aroma.get(), sabor.get()]
+
+    conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
+    cursor = conexao.cursor()
+    sql_insert = """
+                    INSERT INTO avaliacao ( aroma , sabor )
+                    VALUES (?, ?, ?, ?, ?);
+                    """
+    cursor.execute(sql_insert,avaliacao)
     conexao.commit()
     conexao.close()
 

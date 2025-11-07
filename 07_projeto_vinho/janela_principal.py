@@ -3,8 +3,8 @@ import sqlite3
 import tkinter
 from tkinter import messagebox
 
-
 def adicionar_vinho():
+    #pegando os ítens colocados na caixa de texto
     adicionar = [nome_vinho.get(), local.get(), tipo_vinho.get(), ano_colheita.get(), qtde_stock.get()]
 
     conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
@@ -18,8 +18,6 @@ def adicionar_vinho():
     conexao.close()
     atualizar_treeview()
     
-    
-
 def deletar_vinho():
  #selecionando o ítem para remoção
     item_selecionado = treeview.selection()
@@ -39,9 +37,8 @@ def deletar_vinho():
     else:
         messagebox.showerror(title="Erro", message="Por favor, selecione um ítem para excluir!")
 
-
 def atualizar_treeview():
-
+   
     for linha in treeview.get_children():
         treeview.delete(linha)
     
@@ -56,12 +53,73 @@ def atualizar_treeview():
     for linha in resultado:
         treeview.insert("","end",values =linha)
 
-def avaliacao():
-
+def preencher_campos(event):
+    #selecionando o ítem da treeview
     item_selecionado = treeview.selection()
+    #verificando se há ítem selecionado
+    if item_selecionado:
+        #pega os valores da linha selecionada
+        valores = treeview.item(item_selecionado, "values")
+        #apaga o conteúdo que está no entry
+        nome_vinho.delete(0, "end") 
+        #insere os novos dados
+        nome_vinho.insert(0, valores[1])
+        #apaga o conteúdo que está no entry
+        local.delete(0, "end")
+        #insere os novos dados
+        local.insert(0, valores[2])
+        #apaga o conteúdo que está no entry
+        tipo_vinho.delete(0, "end")
+        #insere os novos dados
+        tipo_vinho.insert(0, valores[3])
+        #apaga o conteúdo que está no entry
+        ano_colheita.delete(0, "end")
+        #insere os novos dados
+        ano_colheita.insert(0, valores[4])
+        #apaga o conteúdo que está no entry
+        qtde_stock.delete(0, "end")
+        #insere os novos dados
+        qtde_stock.insert(0, valores[5])
+
+def alterar_dados():
+    #selecionando o ítem da treeview
+    item_selecionado = treeview.selection()
+    #se não estiver nenhum ítem selecionado, mostre essa mensagem
+    if not item_selecionado:
+        messagebox.showerror("Erro", "Selecione um vinho para alterar.")
+        return
+    #pegando os "valores" que estão na treeview
+    valores_atuais = treeview.item(item_selecionado, "values")
+    #pegando os NOVOS valores
+    id_vinho = valores_atuais[0]
+    novo_nome = nome_vinho.get()
+    novo_local = local.get()
+    novo_tipo = tipo_vinho.get()
+    novo_ano = ano_colheita.get()
+    nova_qtde = qtde_stock.get()
+    #fazendo conexão com o BCD
+    conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
+    cursor = conexao.cursor()
+    #fazendo o UPDATE para alterar os dados
+    sql_update = """
+        UPDATE vinho
+        SET nome_vinho = ?, regiao_pais = ?, tipo = ?, ano_colheita = ?, qtde_stock = ?
+        WHERE id = ?;
+    """
+    cursor.execute(sql_update, (novo_nome, novo_local, novo_tipo, novo_ano, nova_qtde, id_vinho))
+    conexao.commit()
+    conexao.close()
+    atualizar_treeview()
+    messagebox.showinfo("Sucesso", "Os dados do vinho foram alterados com sucesso!")
+
+def avaliacao():
+    #selecionando o ítem da treeview
+    item_selecionado = treeview.selection()
+    #se não estiver ítem selcionado, mande essa msg
     if not item_selecionado:
         messagebox.showerror("ERRO!", "Para avaliar, você tem que selecionar um ítem")
         return
+    #criando a janela 2
     janela_2 = ttk.Toplevel(janela)
     janela_2.title("Avaliação")
     janela_2.wm_state("zoomed")
@@ -105,12 +163,13 @@ def avaliacao():
 def salvar_avaliacao():
     global aroma
     global sabor
-
+    #selecionando o ítem fda treeview
     index_selecionado = treeview.selection()
+    #pegando o ítem selecionado
     linha_selecionada = treeview.item(index_selecionado)
+    #ligando o id
     id_vinho = linha_selecionada['values'][0]
-
-
+    #colunas da avaliação
     avaliacao  = [id_vinho, aroma.get(), sabor.get()]
 
     conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
@@ -125,8 +184,7 @@ def salvar_avaliacao():
 
     messagebox.showinfo ( title = "Salvo" , message = "A sua avaliação foi salva com sucesso!" ) 
 
-
-
+#criando a janela principal
 janela = ttk.Window(themename="minty")
 
 janela.title("Degustação de vinhos")
@@ -180,6 +238,8 @@ treeview["columns"] = ("id","nome_vinho", "pais", "tipo", "ano_colheita", "qtde_
 #se eu não quiser a coluna que vem por padrão
 treeview["show"] = "headings"
 
+treeview.bind("<<TreeviewSelect>>",preencher_campos)
+
 #para mostrar os nomes na tela
 #0 já vem por padrão, INUTIL
 # treeview.heading("#0", text="coluna chata")
@@ -190,12 +250,11 @@ treeview.heading("tipo", text="Tipos do vinho")
 treeview.heading("ano_colheita", text="Ano da colheita")
 treeview.heading("qtde_stock", text="Quantidade stock")
 
-
-
 ttk.Button(janela, text="DELETAR", padding=10, width=16, command=deletar_vinho).pack(pady=10)
 
 ttk.Button(janela, text="AVALIAR", padding=10, width=16, command=avaliacao).pack()
 
+ttk.Button(janela, text="ALTERAR", padding=10, width=16, command=alterar_dados).pack(pady=10)
 
 conexao = sqlite3.connect("07_projeto_vinho/bd_projeto_vinho.sqlite")
 cursor = conexao.cursor()

@@ -238,6 +238,7 @@ treeview["columns"] = ("id","nome_vinho", "pais", "tipo", "ano_colheita", "qtde_
 #se eu não quiser a coluna que vem por padrão
 treeview["show"] = "headings"
 
+#colocando os ítens nos campos patra alterar
 treeview.bind("<<TreeviewSelect>>",preencher_campos)
 
 #para mostrar os nomes na tela
